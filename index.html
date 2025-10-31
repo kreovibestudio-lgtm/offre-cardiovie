@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit & Diagnostic Site Web - Cardiovie.fr</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #010001;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: #E1F282;
+            color: rgb(0, 0, 0);
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            background: rgba(71, 70, 70, 0.222);
+            padding: 10px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Navigation */
+        .nav-sticky {
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 2px solid #e2e8f0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        nav {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            padding: 0;
+        }
+
+        nav a {
+            padding: 18px 24px;
+            text-decoration: none;
+            color: var(--gray);
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+            background: #f1f5f9;
+        }
+
+        nav a.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Section */
+        section {
+            padding: 60px 0;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        section h3 {
+            font-size: 1.5rem;
+            margin: 10px 0 10px;
+            color: var(--primary);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.12);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-verdict {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .stat-verdict.danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .stat-verdict.warning {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .stat-verdict.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Alert Box */
+        .alert {
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border-left: 4px solid;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: var(--success);
+            color: #065f46;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: var(--warning);
+            color: #92400e;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: var(--primary);
+            color: #1e40af;
+        }
+
+        /* Problem Cards */
+        .problem-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            border-left: 5px solid var(--danger);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        .problem-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .problem-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--danger);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .problem-title {
+            font-size: 1.5rem;
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+
+        /* Highlight Box */
+        .highlight {
+            background: #dddaff;
+            color: rgb(30, 25, 25);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 40px 0;
+            
+        }
+
+        .highlight h3 {
+            color: rgb(22, 19, 19);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            background: #3f6cfe;
+            color: white;
+            padding: 15px 35px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .cta-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: #e2e8f0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, var(--primary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            transition: width 1s ease;
+        }
+
+        /* Comparison Table */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .comparison-item {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        .comparison-item.good {
+            border-top: 4px solid var(--success);
+        }
+
+        .comparison-item.bad {
+            border-top: 4px solid var(--danger);
+        }
+
+        /* Footer */
+        footer {
+            background: #f3944c;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                flex-direction: column;
+            }
+
+            nav a {
+                border-left: 3px solid transparent;
+                border-bottom: none;
+            }
+
+            nav a.active {
+                border-left-color: var(--primary);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Blockquote */
+        blockquote {
+            border-left: 4px solid var(--primary);
+            padding: 20px 30px;
+            margin: 30px 0;
+            background: #f8fafc;
+            font-style: italic;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🔍 Audit & Diagnostic Site Web</h1>
+            <p><strong>Cardiovie.fr</strong></p>
+            <div class="meta-info">
+                <div class="meta-item">
+                    <strong>Objectif</strong><br>Augmenter les leads qualifiés
+                </div>
+                <div class="meta-item">
+                    <strong>Date</strong><br>Octobre 2025
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-sticky">
+        <div class="container">
+            <nav>
+                <a href="#resume" class="active">Résumé</a>
+                <a href="#probleme1">Problème #1</a>
+                <a href="#probleme2">Problème #2</a>
+                <a href="#probleme3">Problème #3</a>
+                <a href="#opportunite">Opportunité</a>
+                <a href="#approche">Notre Approche</a>
+            </nav>
+        </div>
+    </div>
+
+    <section id="resume">
+        <div class="container">
+            <h2>📋 Résumé Exécutif</h2>
+            
+            <div class="card">
+                <h3>Votre Objectif</h3>
+                <blockquote>
+                    "Augmenter significativement le nombre de leads qualifiés (demandes de devis, inscriptions) via notre site web"
+                </blockquote>
+            </div>
+
+            <h3>La Situation Actuelle</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Trafic mensuel</div>
+                    <div class="stat-value">37</div>
+                    <span class="stat-verdict danger">🔴 Très faible</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Leads générés/mois</div>
+                    <div class="stat-value">2-3</div>
+                    <span class="stat-verdict danger">🔴 Insuffisant</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pages indexées Google</div>
+                    <div class="stat-value">23/36</div>
+                    <span class="stat-verdict warning">🟠 Incomplet (64%)</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Score technique SEO</div>
+                    <div class="stat-value">74/100</div>
+                    <span class="stat-verdict warning">🟡 Correct</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Score SEO global</div>
+                    <div class="stat-value">68/100</div>
+                    <span class="stat-verdict warning">🟠 Moyen</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Sites référents (backlinks)</div>
+                    <div class="stat-value">7</div>
+                    <span class="stat-verdict danger">🔴 Très faible</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Position moyenne Google</div>
+                    <div class="stat-value">10-13</div>
+                    <span class="stat-verdict warning">🟠 Insuffisant</span>
+                </div>
+            </div>
+
+            <div class="alert alert-danger">
+                <h3 style="margin-top: 0;">⚠️ Le Diagnostic</h3>
+                <p><strong>Votre site web ne remplit pas sa mission commerciale.</strong></p>
+                <p>Le site est <strong>techniquement sain mais commercialement invisible</strong> :</p>
+                <ul>
+                    <li>✅ Structure correcte</li>
+                    <li>❌ Peu visible sur Google</li>
+                    <li>❌ Pas optimisé pour convertir les visiteurs en demandes concrètes</li>
+                </ul>
+                <p><strong>Résultat :</strong> Trafic faible et irrégulier → Très peu de leads</p>
+            </div>
+
+            <div class="highlight">
+                <h3>3 Blocages Majeurs Identifiés</h3>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    ❌ <strong>PROBLÈME 1 :</strong> Invisible sur Google (98% du potentiel inexploité)<br>
+                    ❌ <strong>PROBLÈME 2 :</strong> Plateforme inadaptée (Squarespace limite la croissance)<br>
+                    ❌ <strong>PROBLÈME 3 :</strong> Conversion défaillante (70% des visiteurs repartent)
+                </p>
+            </div>
+
+            <div class="alert alert-success">
+                <h3 style="margin-top: 0;">✨ La Bonne Nouvelle</h3>
+                <p><strong>Ces 3 problèmes sont corrigibles.</strong> Nous avons identifié des solutions concrètes pour chacun d'eux.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="probleme1" >
+        <div class="container">
+            <h2>🔍 Analyse des Problèmes</h2>
+            
+            <div class="problem-card">
+                <div class="problem-header">
+                    <div class="problem-icon">1</div>
+                    <div class="problem-title">INVISIBILITÉ SUR GOOGLE</div>
+                </div>
+
+                <div class="alert alert-danger">
+                    <h4>Le Constat</h4>
+                    <p>Votre site attire seulement <strong>37 visiteurs par mois</strong>.</p>
+                    <p>Pour votre secteur (formation médicale B2B), un site performant génère <strong>600-1500 visiteurs/mois minimum</strong>.</p>
+                    <p><strong>Vous êtes absent de Google sur vos mots-clés stratégiques.</strong></p>
+                </div>
+
+                <h3>Les 5 Causes Identifiées</h3>
+
+                <div class="card">
+                    <h4>🚨 1. 36% de votre site est bloqué (CRITIQUE)</h4>
+                    <ul>
+                        <li><strong>13 pages sur 36</strong> ne peuvent pas apparaître dans Google</li>
+                        <li>Ces pages sont invisibles à cause de paramètres d'indexation mal configurés</li>
+                        <li><strong>Impact direct :</strong> Vous perdez immédiatement 30-40% de trafic potentiel</li>
+                    </ul>
+                    <p><strong>Solution :</strong> Déblocage technique (2-3 jours de travail)</p>
+                </div>
+
+                <div class="card">
+                    <h4>🔴 2. Optimisation SEO inexistante</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Problème détecté</th>
+                                <th>Pages affectées</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Pas de meta-description</td>
+                                <td>9 pages</td>
+                                <td>-25% de clics depuis Google</td>
+                            </tr>
+                            <tr>
+                                <td>Titles mal optimisés</td>
+                                <td>9 pages</td>
+                                <td>-20% de visibilité</td>
+                            </tr>
+                            <tr>
+                                <td>Contenu trop faible</td>
+                                <td>3 pages</td>
+                                <td>Google ne les positionne pas</td>
+                            </tr>
+                            <tr>
+                                <td>URLs non-optimisées</td>
+                                <td>4 pages</td>
+                                <td>Pénalité légère</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Conséquence :</strong> Même quand Google trouve vos pages, personne ne clique dessus.</p>
+                </div>
+
+                <div class="card">
+                    <h4>🟠 3. Aucune stratégie de contenu</h4>
+                    
+                    <div class="comparison">
+                        <div class="comparison-item bad">
+                            <h5>❌ Aujourd'hui chez Cardiovie</h5>
+                            <ul>
+                                <li>Pas de blog</li>
+                                <li>Jamais de nouveau contenu</li>
+                                <li>Aucune position sur recherches informatives</li>
+                                <li>Sujets recherchés non couverts</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-item good">
+                            <h5>✅ Vos concurrents</h5>
+                            <ul>
+                                <li>Publient 2-4 articles/mois</li>
+                                <li>Captent 300-400 visiteurs/mois de plus</li>
+                                <li>Contenus ciblés sur chaque formation</li>
+                                <li>Pages pensées pour convertir</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h5>Ce que recherchent vos prospects (mais que vous ne couvrez pas) :</h5>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Recherche</th>
+                                <th>Volume mensuel</th>
+                                <th>Votre position</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>"Comment obtenir l'AFGSU"</td>
+                                <td>400 recherches</td>
+                                <td><span style="color: var(--danger);">❌ Absent</span></td>
+                            </tr>
+                            <tr>
+                                <td>"Prix formation AFGSU"</td>
+                                <td>200 recherches</td>
+                                <td><span style="color: var(--danger);">❌ Absent</span></td>
+                            </tr>
+                            <tr>
+                                <td>"Recyclage AFGSU obligatoire"</td>
+                                <td>250 recherches</td>
+                                <td><span style="color: var(--danger);">❌ Pas positionné</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h4>🟠 4. Autorité web quasi-nulle</h4>
+                    <p>Vous avez <strong>seulement 7 sites référents</strong> (backlinks)</p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concurrent</th>
+                                <th>Sites référents</th>
+                                <th>Visibilité</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Qualisante.fr</strong></td>
+                                <td>~80 sites</td>
+                                <td>Très forte</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SST-formation.info</strong></td>
+                                <td>~120 sites</td>
+                                <td>Forte</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Panacea-conseil.com</strong></td>
+                                <td>~150 sites</td>
+                                <td>Très forte</td>
+                            </tr>
+                            <tr style="background: #fee2e2;">
+                                <td><strong>Cardiovie.fr (VOUS)</strong></td>
+                                <td><strong>7 sites</strong></td>
+                                <td><span style="color: var(--danger);">Faible</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert alert-warning" style="margin-top: 20px;">
+                        <p><strong>Vos concurrents ont 10 à 20 fois plus de backlinks que vous.</strong></p>
+                        <p>Google considère votre site comme "peu important"</p>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </section>
+
+    <section id="probleme2">
+        <div class="container">
+            <div class="problem-card">
+                <div class="problem-header">
+                    <div class="problem-icon">2</div>
+                    <div class="problem-title">SQUARESPACE BRIDE VOTRE CROISSANCE</div>
+                </div>
+
+                <div class="alert alert-info">
+                    <h4>Le Diagnostic Technique</h4>
+                    <p>Votre site est construit sur <strong>Squarespace</strong>, une plateforme conçue pour les sites vitrines simples (portfolios, restaurants, blogs personnels).</p>
+                    <p><strong>Pour un organisme de formation B2B cherchant à générer des leads, c'est l'outil inadapté.</strong></p>
+                </div>
+
+                <h3>Les 7 Limitations Structurelles</h3>
+
+                <div class="card">
+                    <h4>🔴 1. SEO structurellement limité</h4>
+                    <p>Squarespace ne vous permet pas :</p>
+                    <ul>
+                        <li>❌ D'optimiser complètement vos URLs</li>
+                        <li>❌ De contrôler le code HTML</li>
+                        <li>❌ D'utiliser des plugins SEO professionnels</li>
+                        <li>❌ D'implémenter des structures de données avancées</li>
+                        <li>❌ De gérer finement les redirections</li>
+                    </ul>
+                    
+                    <div class="comparison" style="margin-top: 20px;">
+                        <div class="comparison-item bad">
+                            <h5>Avec Squarespace</h5>
+                            <p style="font-size: 1.3rem; font-weight: 700; color: var(--danger);">Max 800-1000<br>visiteurs/mois</p>
+                            <p>Plafond infranchissable</p>
+                        </div>
+                        <div class="comparison-item good">
+                            <h5>Avec WordPress </h5>
+                            <p style="font-size: 1.3rem; font-weight: 700; color: var(--success);">2000-4000+<br>visiteurs/mois</p>
+                            <p>Potentiel illimité</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>🔴 2. Vitesse moyenne = perte de conversions</h4>
+                    <ul>
+                        <li>Code propriétaire non-optimisable</li>
+                        <li>Scripts inutiles chargés automatiquement</li>
+                        <li>PageSpeed probablement 65-75/100</li>
+                    </ul>
+                    <div class="alert alert-warning">
+                        <p><strong>Chaque seconde de chargement en plus = -7% de conversions</strong></p>
+                        <p>Estimation : Vous perdez <strong>20-30% de conversions</strong> juste à cause de la vitesse.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>🔴 3. Outils de conversion amateurs</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Besoin</th>
+                                <th>Squarespace</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Formulaires intelligents</td>
+                                <td>Basiques</td>
+                                <td><span style="color: var(--danger);">-40% soumissions</span></td>
+                            </tr>
+                            <tr>
+                                <td>A/B testing</td>
+                                <td>Impossible</td>
+                                <td><span style="color: var(--danger);">Pas d'optimisation</span></td>
+                            </tr>
+                            <tr>
+                                                                <td>Popups exit-intent</td>
+                                <td>Non disponibles</td>
+                                <td><span style="color: var(--danger);">-15% leads</span></td>
+                            </tr>
+                            <tr>
+                                <td>Chat professionnel</td>
+                                <td>Basique et limité</td>
+                                <td><span style="color: var(--danger);">-25% engagement</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h4>🔴 4. Pas de système de réservation professionnel</h4>
+                    <p><strong>Ce que vous ne pouvez PAS faire actuellement :</strong></p>
+                    <ul>
+                        <li>❌ Afficher les places disponibles en temps réel</li>
+                        <li>❌ Proposer le paiement en ligne</li>
+                        <li>❌ Gérer un calendrier dynamique</li>
+                        <li>❌ Envoyer des confirmations/rappels automatiques</li>
+                    </ul>
+                    <div class="alert alert-danger">
+                        <p><strong>Résultat :</strong> Chaque inscription nécessite des échanges manuels = Friction = Perte de leads</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>🟠 5. Marketing automation quasi-impossible</h4>
+                    <p>Pour convertir les leads "tièdes" en clients, vous avez besoin de :</p>
+                    <ul>
+                        <li>Nurturing automatisé (séquences d'emails)</li>
+                        <li>Lead scoring (priorisation automatique)</li>
+                        <li>Relances personnalisées</li>
+                        <li>Segmentation avancée</li>
+                    </ul>
+                    <div class="alert alert-warning">
+                        <p><strong>Conséquence :</strong> Vous perdez 40-50% des leads qui auraient pu être convertis avec du nurturing.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>🟠 6. Évolutivité nulle</h4>
+                    <p>Dans 2-3 ans, vous voudrez peut-être :</p>
+                    <ul>
+                        <li>Modules e-learning en ligne</li>
+                        <li>Espace client avec suivi des formations</li>
+                        <li>Application mobile</li>
+                        <li>Fonctionnalités sur-mesure</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Avec Squarespace : IMPOSSIBLE</strong></p>
+                </div>
+
+                <div class="highlight">
+                    <h4>⚖️ Le Verdict</h4>
+                    <p style="font-size: 1.2rem;">
+                        <strong>Squarespace pour générer des leads B2B =<br>
+                        Utiliser une Twingo pour des livraisons professionnelles</strong>
+                    </p>
+                    <p style="margin-top: 20px;">
+                        Ça fonctionne "un peu", mais vous êtes structurellement handicapé face à la concurrence qui utilise des outils professionnels.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem 3 -->
+    <section id="probleme3">
+        <div class="container">
+            <div class="problem-card">
+                <div class="problem-header">
+                    <div class="problem-icon">3</div>
+                    <div class="problem-title">CONVERSION DÉFAILLANTE</div>
+                </div>
+
+                <div class="alert alert-info">
+                    <h4>Le Test Réel</h4>
+                    <p><strong>Imaginez un Directeur RH qui cherche une formation AFGSU pour son équipe :</strong></p>
+                </div>
+
+                <table style="margin: 30px 0;">
+                    <thead>
+                        <tr>
+                            <th>Étape</th>
+                            <th>Ce qui se passe</th>
+                            <th>Résultat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1. Arrive sur votre page</td>
+                            <td>Pas de CTA visible en haut</td>
+                            <td><span style="color: var(--danger);">10% repartent</span></td>
+                        </tr>
+                        <tr>
+                            <td>2. Cherche les infos</td>
+                            <td>Prix ? Dates ? Durée ? Vague...</td>
+                            <td><span style="color: var(--danger);">20% frustrés partent</span></td>
+                        </tr>
+                        <tr>
+                            <td>3. Veut vous contacter</td>
+                            <td>Bouton uniquement en bas de page</td>
+                            <td><span style="color: var(--danger);">15% ne trouvent pas</span></td>
+                        </tr>
+                        <tr>
+                            <td>4. Remplit le formulaire</td>
+                            <td>7-8 champs, trop long</td>
+                            <td><span style="color: var(--danger);">40% abandonnent</span></td>
+                        </tr>
+                        <tr>
+                            <td>5. Hésite avant d'envoyer</td>
+                            <td>Aucune réassurance visible</td>
+                            <td><span style="color: var(--danger);">10% n'envoient pas</span></td>
+                        </tr>
+                        <tr style="background: #fee2e2; font-weight: 700;">
+                            <td colspan="2">RÉSULTAT FINAL sur 100 visiteurs qualifiés</td>
+                            <td><span style="font-size: 1.3rem; color: var(--danger);">❌ Seulement 2-3 leads</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-danger">
+                    <h4>📉 Vous perdez 97% des visiteurs qualifiés.</h4>
+                </div>
+
+                <h3>Les 8 Problèmes de Conversion</h3>
+
+                <div class="card">
+                    <h4>Comparaison avec les meilleures pratiques du secteur :</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Élément</th>
+                                <th>Vos concurrents performants</th>
+                                <th>Cardiovie</th>
+                                <th>Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CTA visibles</td>
+                                <td>Multiples et évidents</td>
+                                <td>Discrets</td>
+                                <td><span style="color: var(--danger);">-40% contacts</span></td>
+                            </tr>
+                            <tr>
+                                <td>Formulaires</td>
+                                <td>3 champs max</td>
+                                <td>7-8 champs</td>
+                                <td><span style="color: var(--danger);">-60% soumissions</span></td>
+                            </tr>
+                            <tr>
+                                <td>Infos clés</td>
+                                <td>Prix, dates, durée visibles</td>
+                                <td>Absentes ou floues</td>
+                                <td><span style="color: var(--danger);">-30% confiance</span></td>
+                            </tr>
+                            <tr>
+                                <td>Témoignages</td>
+                                <td>Détaillés avec photos</td>
+                                <td>Logos seulement</td>
+                                <td><span style="color: var(--danger);">-25% réassurance</span></td>
+                            </tr>
+                            <tr>
+                                <td>Avis clients</td>
+                                <td>Affichés (Google, etc.)</td>
+                                <td>Non visibles</td>
+                                <td><span style="color: var(--danger);">-20% crédibilité</span></td>
+                            </tr>
+                            <tr>
+                                <td>Chat en direct</td>
+                                <td>Présent</td>
+                                <td>Absent</td>
+                                <td><span style="color: var(--danger);">-30% leads chauds</span></td>
+                            </tr>
+                            <tr>
+                                <td>Appel à l'action</td>
+                                <td>"Réserver", "Devis 24h"</td>
+                                <td>Peu incitatifs</td>
+                                <td><span style="color: var(--danger);">-25% urgence</span></td>
+                            </tr>
+                            <tr style="background: #d1fae5;">
+                                <td><strong>Taux conversion</strong></td>
+                                <td><strong>8-12%</strong></td>
+                                <td><strong style="color: var(--danger);">2-3%</strong></td>
+                                <td><strong>Vos concurrents convertissent 3-4x mieux</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h4>1. ❌ CTA (Appels à l'action) invisibles</h4>
+                    <ul>
+                        <li>Pas de bouton "Demander un devis" visible immédiatement</li>
+                        <li>Pas de "Réserver une session" en évidence</li>
+                        <li>Pas de CTA qui suit le scroll</li>
+                        <li>Formulaires trop discrets</li>
+                    </ul>
+                    <p><strong>Impact :</strong> <span style="color: var(--danger);">40-50% des visiteurs ne savent pas comment vous contacter</span></p>
+                </div>
+
+                <div class="card">
+                    <h4>2. ❌ Formulaire non-optimisé</h4>
+                    <ul>
+                        <li>7-8 champs à remplir (trop long)</li>
+                        <li>Pas de logique conditionnelle</li>
+                        <li>Design peu engageant</li>
+                        <li>Pas de réassurance ("Réponse rapide", "Sans engagement")</li>
+                    </ul>
+                    <div class="comparison">
+                        <div class="comparison-item bad">
+                            <h5>❌ Cardiovie</h5>
+                            <p>7-8 champs obligatoires</p>
+                        </div>
+                        <div class="comparison-item good">
+                            <h5>✅ Best Practice</h5>
+                            <p>3 champs maximum<br>(Nom, Email, Message)</p>
+                        </div>
+                    </div>
+                    <p><strong>Impact :</strong> <span style="color: var(--danger);">60% d'abandon du formulaire</span></p>
+                </div>
+
+                <div class="card">
+                    <h4>3. ❌ Informations pratiques manquantes</h4>
+                    <p><strong>Ce que cherchent vos visiteurs B2B :</strong></p>
+                    <ul>
+                        <li>❌ Prix ou fourchette indicative</li>
+                        <li>❌ Dates des prochaines sessions</li>
+                        <li>❌ Durée précise</li>
+                        <li>❌ Nombre de participants</li>
+                        <li>❌ Programme détaillé téléchargeable</li>
+                    </ul>
+                    <div class="alert alert-warning">
+                        <p><strong>Impact :</strong> Manque de confiance = Abandon</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>4. ❌ Témoignages et preuves sociales insuffisants</h4>
+                    <ul>
+                        <li>✅ Logos clients présents (bien !)</li>
+                        <li>❌ Pas de témoignages détaillés avec noms et fonctions</li>
+                        <li>❌ Pas d'avis Google visibles sur le site</li>
+                        <li>❌ Pas de vidéos témoignages</li>
+                        <li>❌ Pas de mise en avant du "98% de satisfaction" et "2200+ stagiaires"</li>
+                    </ul>
+                    <p><strong>Impact :</strong> <span style="color: var(--danger);">-30% de conversions par manque de preuve sociale</span></p>
+                </div>
+
+                <div class="card">
+                    <h4>5. ❌ Pas de chat en direct</h4>
+                    <ul>
+                        <li>Questions en temps réel ? Impossible</li>
+                        <li>Le visiteur doit attendre une réponse par email</li>
+                        <li>Perte des prospects "chauds" qui veulent une info immédiate</li>
+                    </ul>
+                    <p><strong>Impact :</strong> <span style="color: var(--danger);">Perte d'opportunités chaudes</span></p>
+                </div>
+
+                <div class="card">
+                    <h4>6. ❌ Une seule option de contact</h4>
+                    <div class="comparison">
+                        <div class="comparison-item bad">
+                            <h5>❌ Actuellement</h5>
+                            <ul>
+                                <li>Formulaire uniquement</li>
+                                <li>Pas de téléphone cliquable mobile</li>
+                                <li>Pas de WhatsApp Business</li>
+                                <li>Pas de calendrier de prise de RDV</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-item good">
+                            <h5>✅ Benchmark concurrents</h5>
+                            <ul>
+                                <li>Formulaire</li>
+                                <li>Téléphone cliquable</li>
+                                <li>Chat en direct</li>
+                                <li>Calendrier de RDV</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p><strong>Impact :</strong> <span style="color: var(--danger);">-40% de leads potentiels</span></p>
+                </div>
+
+                <div class="card">
+                    <h4>7. ❌ Aucun élément d'urgence ou d'incitation</h4>
+                    <ul>
+                        <li>Pas de places limitées affichées</li>
+                        <li>Pas de dates visibles</li>
+                        <li>Pas d'offre temporelle ("Inscrivez-vous avant le...")</li>
+                        <li>Pas de bénéfice immédiat ("Réponse en 24h")</li>
+                    </ul>
+                    <p><strong>Impact :</strong> Procrastination = Perte de leads</p>
+                </div>
+
+                <div class="card">
+                    <h4>8. ❌ Parcours non-segmenté</h4>
+                    <p>Un Directeur d'hôpital ≠ Un RH d'entreprise ≠ Un professionnel indépendant</p>
+                    <p>Pourtant, tous voient le même message générique.</p>
+                    <p><strong>Impact :</strong> <span style="color: var(--danger);">Message dilué = -35% de conversions</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Opportunity Section -->
+    <section id="opportunite" >
+        <div class="container">
+            <h2>💡 L'OPPORTUNITÉ</h2>
+
+            <div class="highlight" style="background: white;">
+                <h3>Ce Qui Est Possible</h3>
+                
+                <div class="stats-grid" style="margin: 30px 0;">
+                    <div class="stat-card">
+                        <div class="stat-label">Qualisante.fr</div>
+                        <div class="stat-value">80-120</div>
+                        <p>leads/mois</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">SST-formation.info</div>
+                        <div class="stat-value">100-150</div>
+                        <p>leads/mois</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Panacea-conseil.com</div>
+                        <div class="stat-value">150-200+</div>
+                        <p>leads/mois</p>
+                    </div>
+                    <div class="stat-card" style="border-left-color: var(--danger);">
+                        <div class="stat-label">Cardiovie (VOUS)</div>
+                        <div class="stat-value" style="color: var(--danger);">0</div>
+                        <p>leads/mois</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-danger">
+                    <h4>L'écart : vos concurrents génèrent 30 à 70 fois plus de leads que vous.</h4>
+                </div>
+
+                <h4 style="margin-top: 40px;">Ce qui est réaliste pour Cardiovie :</h4>
+
+                <div class="card">
+                    <h5>🎯 Court terme (3-6 mois)</h5>
+                    <ul>
+                        <li><strong>Trafic :</strong> 600-1000 visiteurs/mois (vs 37 actuellement)</li>
+                        <li><strong>Leads :</strong> 50-80 leads/mois (vs 0 actuellement)</li>
+                        <li><strong>Objectif :</strong> Doubler la visibilité, multiplier par 3 les demandes</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h5>🚀 Moyen terme (12 mois)</h5>
+                    <ul>
+                        <li><strong>Trafic :</strong> 1500-2500 visiteurs/mois</li>
+                        <li><strong>Leads :</strong> 150-250 leads/mois</li>
+                        <li><strong>Objectif :</strong> Devenir une référence locale en formation santé</li>
+                    </ul>
+                </div>
+
+                <div class="highlight" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                    <h3 style="color: white;">Soit une multiplication par 50 à 100 de vos résultats actuels</h3>
+                    <p style="font-size: 1.2rem; margin-top: 15px;">= Rattraper vos concurrents</p>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 40px;">
+                <h3>Les Leviers d'Action</h3>
+                <p>Pour rattraper vos concurrents et atteindre 50-80 leads/mois, il faut agir sur 3 axes :</p>
+
+                <div class="action-grid">
+                    <div class="action-item">
+                        <h4>Visibilité (Résoudre Problème #1)</h4>
+                        <ul>
+                            <li>Débloquer les 13 pages invisibles</li>
+                            <li>Créer des pages ciblées</li>
+                            <li>Optimiser le SEO on-page complet</li>
+                            <li>Lancer une stratégie de contenu</li>
+                            <li>Acquérir 30-50 backlinks de qualité</li>
+                            <li>Développer le SEO local</li>
+                        </ul>
+                    </div>
+
+                    <div class="action-item">
+                        <h4>Plateforme (Résoudre Problème #2)</h4>
+                        <ul>
+                            <li>Migrer vers WordPress.org</li>
+                            <li>Obtenir tous les outils nécessaires</li>
+                            <li>Assurer l'évolutivité future</li>
+                            <li>Réduire les coûts (73€/an vs 720€/an)</li>
+                        </ul>
+                    </div>
+
+                    <div class="action-item">
+                        <h4>Conversion (Résoudre Problème #3)</h4>
+                        <ul>
+                            <li>Refondre le parcours utilisateur</li>
+                            <li>Ajouter CTA visibles</li>
+                            <li>Simplifier les formulaires (3 champs max)</li>
+                            <li>Ajouter témoignages et avis clients</li>
+                            <li>Implémenter chat et calendrier de RDV</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="alert alert-success" style="margin-top: 30px;">
+                    <h4>🎯 Objectif global : Passer de 0 leads/mois à 50-80 leads/mois en 6 mois</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Approach Section -->
+    <section id="approche">
+        <div class="container">
+            <h2>🎯 NOTRE APPROCHE</h2>
+
+            <div class="card">
+                <h3>Comment nous pouvons vous aider</h3>
+                <div class="alert alert-info" style="margin: 30px 0;">
+                    <h4>Notre constat après analyse approfondie :</h4>
+                    <p>Pour atteindre vos objectifs (50-100+ leads/mois), <strong>une simple optimisation de l'existant ne suffira pas</strong>. Les limitations structurelles de Squarespace empêchent toute croissance significative.</p>
+                </div>
+
+                <div class="highlight">
+                    <h4>Notre recommandation : Migration vers une plateforme professionnelle</h4>
+                    <p style="margin-top: 15px;">Nous vous recommandons une migration vers <strong>WordPress.org</strong>, la plateforme standard pour les sites professionnels générant des leads B2B.</p>
+                </div>
+
+                <h4 style="margin: 40px 0 20px;">Pourquoi WordPress.org ?</h4>
+
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <h5>🚀 1. Lever le Plafond Technique</h5>
+                        <ul>
+                            <li>✅ SEO illimité (vs bridé sur Squarespace)</li>
+                            <li>✅ Vitesse optimale</li>
+                            <li>✅ Outils de conversion professionnels</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <h5>⚖️ 2. Propriété et Contrôle Total</h5>
+                        <ul>
+                            <li>✅ Vous possédez 100% du code</li>
+                            <li>✅ Indépendance complète</li>
+                            <li>✅ Coûts : 73€/an vs 720€/an</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="comparison">
+                    <div class="comparison-item">
+                        <h5>📈 3. Évolutivité Illimitée</h5>
+                        <ul>
+                            <li>✅ Réservation en ligne</li>
+                            <li>✅ Espace client</li>
+                            <li>✅ E-learning futur</li>
+                            <li>✅ Toute fonctionnalité sur-mesure</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-item">
+                        <h5>💰 4. ROI Supérieur Long Terme</h5>
+                        <ul>
+                            <li>✅ Potentiel 300-500+ leads/mois</li>
+                            <li>✅ Coûts récurrents divisés par 10</li>
+                            <li>✅ Pas de dépendance éditeur</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Notre Méthodologie de Migration</h3>
+                <p>Nous avons développé un processus éprouvé pour les migrations d'organismes de formation :</p>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>PHASE 1 : Quick Wins Pendant Migration (Semaines 1-4)</h4>
+                            <p>Pendant que nous développons votre nouveau site WordPress, nous ne restons pas les bras croisés :</p>
+                            <ul>
+                                <li>Déblocage des 13 pages invisibles</li>
+                                <li>Optimisations SEO prioritaires</li>
+                                <li>Amélioration CTA et formulaires</li>
+                            </ul>
+                            <div class="alert alert-success">
+                                <strong>Objectif : Doubler vos leads pendant la migration</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>PHASE 2 : Migration & Refonte WordPress (Semaines 5-12)</h4>
+                            <p>Développement de votre plateforme d'acquisition professionnelle :</p>
+                            <ul>
+                                <li>Workshop stratégie avec vous</li>
+                                <li>Design moderne conversion-optimisé</li>
+                                <li>Développement WordPress.org sur-mesure</li>
+                                <li>Pages formations refondues</li>
+                                <li>Système de réservation professionnel</li>
+                                <li>Outils de conversion (formulaires, chat, calendrier)</li>
+                                <li>Migration complète du contenu (0 perte)</li>
+                                <li>Formation de votre équipe</li>
+                            </ul>
+                            <div class="guarantee-box">
+                                <h5>Garanties migration :</h5>
+                                <ul>
+                                    <li>✅ 0 perte de contenu</li>
+                                    <li>✅ 0 perte de référencement (redirections 301)</li>
+                                    <li>✅ Site 2x plus rapide minimum</li>
+                                    <li>✅ 0 heure d'interruption (développement en parallèle)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>PHASE 3 : Acquisition & Croissance (Mois 3-6)</h4>
+                            <p>Exploitation du nouveau potentiel :</p>
+                            <ul>
+                                <li>Stratégie de contenu SEO (blog)</li>
+                                <li>Campagne backlinks</li>
+                                <li>Optimisations conversion continues</li>
+                                <li>Google Ads (optionnel)</li>
+                                <li>Marketing automation</li>
+                            </ul>
+                            <div class="alert alert-success">
+                                <h5>Résultats attendus :</h5>
+                                <ul>
+                                    <li><strong>Mois 2 :</strong> x2 leads (quick wins)</li>
+                                    <li><strong>Mois 4 :</strong> x10-15 leads (WordPress opérationnel)</li>
+                                    <li><strong>Mois 6 :</strong> x40-50 leads (stratégie complète)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Next Steps Section -->
+    <section id="etapes" >
+        <div class="container">
+            <h2>📋 PROCHAINES ÉTAPES</h2>
+
+            <div class="card">
+                <h3>Pour Aller Plus Loin</h3>
+                <p style="font-size: 1.1rem;">Cet audit vous a permis de comprendre <strong>où se situent les blocages</strong> et <strong>ce qu'il faut faire</strong> pour rattraper vos concurrents.</p>
+                
+                <div class="highlight" style="margin: 30px 0;">
+                    <h4>La prochaine étape : Répondre au questionnaire stratégique.</h4>
+                    <p style="margin-top: 15px;">Pour construire une proposition parfaitement adaptée à votre situation et vos besoins spécifiques, nous avons besoin de mieux comprendre :
+
+                <ul>
+                <li>Vos objectifs prioritaires</li>
+                <li>Vos contraintes (budget, délais, ressources)</li>
+                <li>Vos besoins fonctionnels</li>
+                </ul>
+                </p>
+                </div>
+
+                <div class="cta-box">
+                    <h4>Le processus :</h4>
+                    <ul>
+                        <li><strong>Vous remplissez le questionnaire</strong> (5-8 minutes)
+                        → Questions ciblées sur vos objectifs, priorités et contraintes
+                        </li>
+                        <li><strong>Nous élaborons votre proposition sur-mesure</strong> (24-48h)
+                        → Plan d'action personnalisé → Timeline précise → Budget détaillé et transparent </li>
+                        <li><strong>Nous échangeons ensemble (30-45 minutes)</strong> → Présentation de la proposition → Réponses à toutes vos questions → Discussion et ajustements si nécessaire
+
+</li>
+        
+                    </ul>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="https://tally.so/r/mOpJgY" class="cta-button" target="_blank">Répondre au questionnaire</a>
+                    </div>
+                </div>
+
+                <div class="alert alert-info" style="margin-top: 30px;">
+                    <h4>Aucune obligation</h4>
+                    <p>Cet échange est <strong>sans engagement</strong>. Notre objectif est de vous aider à prendre la meilleure décision pour votre activité.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div style="text-align: center;">
+                <p style="margin-bottom: 10px; font-size: 1.1rem;">
+                    <strong>Audit réalisé par Kréo Vibes Studio</strong>
+                </p>
+                <p style="opacity: 0.8;">
+                    Date : Octobre 2025 | Client : Cardiovie.fr
+                </p>
+                <p style="margin-top: 20px; opacity: 0.7; font-size: 0.9rem;">
+                    © 2025 Tous droits réservés | Document confidentiel
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Active navigation highlight
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('nav a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .stat-card, .action-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
